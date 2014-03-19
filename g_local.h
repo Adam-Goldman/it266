@@ -74,7 +74,12 @@ typedef enum
 	WEAPON_READY, 
 	WEAPON_ACTIVATING,
 	WEAPON_DROPPING,
-	WEAPON_FIRING
+	WEAPON_FIRING,
+
+	//modded code
+	WEAPON_END_MAG,
+	WEAPON_RELOADING,
+
 } weaponstate_t;
 
 typedef enum
@@ -479,6 +484,8 @@ extern	int	body_armor_index;
 #define MOD_TRIGGER_HURT	31
 #define MOD_HIT				32
 #define MOD_TARGET_BLASTER	33
+//+BD - Added for firing. Tells server how you died?
+#define MOD_Mk23			34
 #define MOD_FRIENDLY_FIRE	0x8000000
 
 extern	int	meansOfDeath;
@@ -603,6 +610,7 @@ int PowerArmorType (edict_t *ent);
 gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+void GunGame(edict_t *ent);
 
 //
 // g_utils.c
@@ -938,6 +946,10 @@ struct gclient_s
 	int			flood_whenhead;		// head pointer for when said
 
 	float		respawn_time;		// can respawn when time > this
+
+	int			Mk23_max;			//max ammo
+	int			Mk23_rds;			//rounds left
+
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?

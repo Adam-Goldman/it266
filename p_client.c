@@ -296,6 +296,12 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		{
 			switch (mod)
 			{
+			//+BD Add our client obit messages
+			case MOD_Mk23:		
+				message = "was ventilated by";
+				message2= "'s Mark 23 Pistol";
+				break;
+			//+BD end of add
 			case MOD_BLASTER:
 				message = "was blasted by";
 				break;
@@ -377,6 +383,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				}
 				return;
 			}
+
 		}
 	}
 
@@ -591,7 +598,8 @@ void InitClientPersistant (gclient_t *client)
 
 	memset (&client->pers, 0, sizeof(client->pers));
 
-	item = FindItem("Blaster");
+	//item = FindItem("Blaster");
+	item = FindItem("Mk23");		//starting weapon is Mk23
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 
@@ -1086,6 +1094,11 @@ void PutClientInServer (edict_t *ent)
 	client_persistant_t	saved;
 	client_respawn_t	resp;
 
+	// new declaration to give ammo
+	gitem_t *item;
+
+	
+	
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
@@ -1232,6 +1245,15 @@ void PutClientInServer (edict_t *ent)
 	}
 
 	gi.linkentity (ent);
+
+
+	// give yourself 4 clips (4 X 12 = 48)
+    item = FindItem("Bullets");     
+	Add_Ammo(ent,item,48);
+
+	//makeing clip size
+	client->Mk23_max = 12;
+    client->Mk23_rds = client->Mk23_max;
 
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;

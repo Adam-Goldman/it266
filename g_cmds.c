@@ -1,6 +1,10 @@
 #include "g_local.h"
 #include "m_player.h"
 
+//+BD local declaration of our new command function
+	void Cmd_Reload_f (edict_t *ent);
+	//+BD end add
+
 
 char *ClientTeam (edict_t *ent)
 {
@@ -954,6 +958,11 @@ void ClientCommand (edict_t *ent)
 		Cmd_InvUse_f (ent);
 	else if (Q_stricmp (cmd, "invdrop") == 0)
 		Cmd_InvDrop_f (ent);
+
+	//+BD - for handling reload commands
+  	else if (Q_stricmp (cmd, "reload") == 0)
+     		 Cmd_Reload_f (ent);
+
 	else if (Q_stricmp (cmd, "weapprev") == 0)
 		Cmd_WeapPrev_f (ent);
 	else if (Q_stricmp (cmd, "weapnext") == 0)
@@ -968,6 +977,46 @@ void ClientCommand (edict_t *ent)
 		Cmd_Wave_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
-	else	// anything that doesn't match a command will be a chat
+	else 	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
+
+//+BD ENTIRE CODE BLOCK NEW
+	// Cmd_Reload_f()
+	// Handles weapon reload requests
+	void Cmd_Reload_f (edict_t *ent)
+	{
+   		int rds_left;           //+BD - Variable to handle rounds left
+
+  		 //+BD - If the player is dead, don't bother
+  	 	if(ent->deadflag == DEAD_DEAD)
+   		{
+     		 	gi.centerprintf(ent, "I know you're a hard ass,\nBUT YOU'RE FUCKING DEAD!!\n");
+      			return;
+  		 }
+
+   		//First, grab the current magazine max count...
+  		if(stricmp(ent->client->pers.weapon->pickup_name, "Mk23") == 0)
+      			rds_left = ent->client->Mk23_max;
+		else    //We should never get here, but...
+  			 //BD 5/26 - Actually we get here quite often right now. Just exit for weaps that we
+   			//          don't want reloaded or that never reload (grenades)
+  	 	{
+      			gi.centerprintf(ent,"Where'd you train?\nYou can't reload that!\n");
+      			return;
+   		}
+
+   		if(ent->client->pers.inventory[ent->client->ammo_index])
+   		{       
+      			if((ent->client->weaponstate != WEAPON_END_MAG) && (ent->client->pers.inventory[ent->client->ammo_index] < rds_left))
+      			{
+            				gi.centerprintf(ent,"Buy a clue-\nYou're on your last magazine!\n");
+      			}
+   			else
+   				//Set the weaponstate...
+      				ent->client->weaponstate = WEAPON_RELOADING;
+  	 	}
+   		else
+      			gi.centerprintf(ent,"Pull your head out-\nYou've got NO AMMO!\n");
+	}
+	//+BD END CODE BLOCK

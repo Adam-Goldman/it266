@@ -127,10 +127,10 @@ void SP_turret_driver (edict_t *self);
 
 
 spawn_t	spawns[] = {
-	{"item_health", SP_item_health},
+	/*{"item_health", SP_item_health},
 	{"item_health_small", SP_item_health_small},
 	{"item_health_large", SP_item_health_large},
-	{"item_health_mega", SP_item_health_mega},
+	{"item_health_mega", SP_item_health_mega},*/
 
 	{"info_player_start", SP_info_player_start},
 	{"info_player_deathmatch", SP_info_player_deathmatch},
@@ -174,7 +174,7 @@ spawn_t	spawns[] = {
 	{"target_goal", SP_target_goal},
 	{"target_splash", SP_target_splash},
 	{"target_spawner", SP_target_spawner},
-	{"target_blaster", SP_target_blaster},
+	//{"target_blaster", SP_target_blaster},
 	{"target_crosslevel_trigger", SP_target_crosslevel_trigger},
 	{"target_crosslevel_target", SP_target_crosslevel_target},
 	{"target_laser", SP_target_laser},
@@ -269,7 +269,7 @@ void ED_CallSpawn (edict_t *ent)
 	}
 
 	// check item spawn functions
-	for (i=0,item=itemlist ; i<game.num_items ; i++,item++)
+	/*for (i=0,item=itemlist ; i<game.num_items ; i++,item++)
 	{
 		if (!item->classname)
 			continue;
@@ -278,7 +278,7 @@ void ED_CallSpawn (edict_t *ent)
 			SpawnItem (ent, item);
 			return;
 		}
-	}
+	}*/
 
 	// check normal spawn functions
 	for (s=spawns ; s->name ; s++)

@@ -72,6 +72,8 @@ Killed
 */
 void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
+	int i;
+	
 	if (targ->health < -999)
 		targ->health = -999;
 
@@ -104,6 +106,9 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 	}
 
 	targ->die (targ, inflictor, attacker, damage, point);
+
+	GunGame(attacker);// call method here
+
 }
 
 
