@@ -311,7 +311,7 @@ void CheckDMRules (void)
 			if (!g_edicts[i+1].inuse)
 				continue;
 
-			if (/*cl->resp.score*/20 >= fraglimit->value)
+			if (/*cl->resp.score*/10 >= fraglimit->value)
 			{
 				gi.bprintf (PRINT_HIGH, "Fraglimit hit.\n");
 				EndDMLevel ();
