@@ -351,27 +351,60 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
 //actual method for switching guns
 void GunGame(edict_t *ent)
 {
-
+	gitem_t		*pickup_item;
+	gitem_t		*drop_item;
 	int i;
 
 	if(ent->client->resp.score++)
 	{	
-		i = ent->client->resp.score + 1;
+		i = 1;
+		i++;
+		
 		
 		switch(i)
 		{
 			case 2:
-				Drop_Weapon(ent->client,"Mk23");
-				Pickup_Weapon(ent->client, "Blaster");
-				ent->client->newweapon = FindItem ("Blaster");
+				pickup_item = FindItem("Blaster");
+				drop_item = FindItem("Mk23");
 				break;
 			case 3:
-				//ChangeWeapon(attacker);
-				Drop_Weapon(ent->client, "Blaster");
-				Pickup_Weapon(ent->client, "HyperBlaster");
-				ent->client->newweapon = FindItem ("hyperblaster");
+				pickup_item = FindItem("Blaster");
+				drop_item = FindItem("Shotgun");
+				break;
+			case 4:
+				pickup_item = FindItem("Super Shotgun");
+				drop_item = FindItem("Shotgun");
+				break;
+			case 5:
+				pickup_item = FindItem("Chaingun");
+				drop_item = FindItem("Super Shotgun");
+				break;
+			case 6:
+				pickup_item = FindItem("HyperBlaster");
+				drop_item = FindItem("Chaingun");
+				break;
+			case 7:
+				pickup_item = FindItem("Grenade Launcher");
+				drop_item = FindItem("HyperBlaster");
+				break;
+			case 8:
+				pickup_item = FindItem("Rocket Launcher");
+				drop_item = FindItem("Grenade Launcher");
+				break;
+			case 9:
+				pickup_item = FindItem("Railgun");
+				drop_item = FindItem("Rocket Launcher");
+				break;
+			case 10:
+				pickup_item = FindItem("Sword");
+				drop_item = FindItem("Railgun");
 				break;
 		}
+		Pickup_Weapon(ent->client, pickup_item);
+		Drop_Weapon(ent->client,drop_item);
+		ent->client->pers.selected_item = ITEM_INDEX(pickup_item);
+		ent->client->pers.inventory[ent->client->pers.selected_item] = 1;
+		ent->client->newweapon = ent->client->pers.weapon;
 	}
 }
 
@@ -390,7 +423,15 @@ A generic function to handle the basics of weapon thinking
 //reloud frams
 #define FRAME_RELOAD_FIRST		(FRAME_DEACTIVATE_LAST +1)
 #define FRAME_LASTRD_FIRST		(FRAME_RELOAD_LAST +1)
-#define MK23MAG 12
+#define MK23MAG					12
+#define BLASTERMAG				8
+#define SHOTGUNMAG				6
+#define SUPERSHOTGUNMAG			7
+#define CHAINGUNMAG				32
+#define HYPERBLASTERMAG			40
+#define GRENADEMAG				6
+#define ROCKETMAG				4
+#define RAILGUNMAG				5
 
 void Weapon_Generic (	edict_t *ent, 
 					int FRAME_ACTIVATE_LAST, 
@@ -423,6 +464,62 @@ void Weapon_Generic (	edict_t *ent,
 					else if(ent->client->ps.gunframe == 60)
 						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
 				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Rocket Launcher") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Grenade Launcher") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Blaster") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "HyperBlaster") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Shotgun") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Chaingun") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Super Shotgun") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Railgun") == 0)
+				{
+					if(ent->client->ps.gunframe == 50)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipout.wav"), 1, ATTN_NORM, 0);
+					else if(ent->client->ps.gunframe == 54)
+						gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/clipin.wav"), 1, ATTN_NORM, 0);				
+				}
 			}
 			else
 			{
@@ -430,10 +527,66 @@ void Weapon_Generic (	edict_t *ent,
 				ent->client->weaponstate = WEAPON_READY;
 				if(stricmp(ent->client->pers.weapon->pickup_name, "Mk23") == 0)
 				{
-					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Mk23_max)
-						ent->client->Mk23_rds = ent->client->Mk23_max;
-				else
-					ent->client->Mk23_rds = ent->client->pers.inventory[ent->client->ammo_index];
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+					ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Rocket Launcher") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Blaster") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Shotgun") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Super Shotgun") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Chaingun") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "HyperBlaster") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Grenade Launcher") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
+				}
+				else if(stricmp(ent->client->pers.weapon->pickup_name, "Railgun") == 0)
+				{
+					if(ent->client->pers.inventory[ent->client->ammo_index] >=  ent->client->Ammo_max)
+						ent->client->Ammo_rds = ent->client->Ammo_max;
+					else
+						ent->client->Ammo_rds = ent->client->pers.inventory[ent->client->ammo_index];
 				}
 			
 			}
@@ -474,8 +627,64 @@ void Weapon_Generic (	edict_t *ent,
 			{
 				if(ent->client->ps.gunframe == 3)
 					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
-					ent->client->Mk23_max = MK23MAG;	//set mag rounds 						
-					ent->client->Mk23_rds = MK23MAG;	//fill the mag...
+					ent->client->Ammo_max = MK23MAG;	//set mag rounds 						
+					ent->client->Ammo_rds = MK23MAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Rocket Launcher") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = ROCKETMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = ROCKETMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Blaster") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = BLASTERMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = BLASTERMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Shotgun") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = SHOTGUNMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = SHOTGUNMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Super Shotgun") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = SUPERSHOTGUNMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = SUPERSHOTGUNMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Chaingun") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = CHAINGUNMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = CHAINGUNMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Hyper Blaster") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = HYPERBLASTERMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = HYPERBLASTERMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Grenade Launcher") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = GRENADEMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = GRENADEMAG;	//fill the mag...
+			}
+			else if(stricmp(ent->client->pers.weapon->pickup_name, "Railgun") == 0)
+			{
+				if(ent->client->ps.gunframe == 3)
+					gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23sld.wav"), 1, ATTN_NORM, 0);
+					ent->client->Ammo_max = RAILGUNMAG;	//set mag rounds 						
+					ent->client->Ammo_rds = RAILGUNMAG;	//fill the mag...
 			}
 			ent->client->ps.gunframe++;
 			return;
@@ -762,6 +971,22 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
+	//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+			ent->client->Ammo_rds--;
+		}
+
 	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
 
 	gi.WriteByte (svc_muzzleflash);
@@ -819,6 +1044,21 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
 
+	if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
+			ent->client->Ammo_rds--;
+		}
+
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -835,13 +1075,10 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 void Weapon_RocketLauncher (edict_t *ent)
 {
-	//static int	pause_frames[]	= {25, 33, 42, 50, 0};
-	//static int	fire_frames[]	= {5, 0};
+	static int	pause_frames[]	= {25, 33, 42, 50, 0};
+	static int	fire_frames[]	= {5, 0};
 
-	static int	pause_frames[]	= {38, 43, 51, 61, 0};
-	static int	fire_frames[]	= {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 0};
-
-	Weapon_Generic (ent, 4, 12, 50, 54, 0,0, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
+	Weapon_Generic (ent, 4, 12, 50, 54, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
 }
 
 
@@ -868,6 +1105,22 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
+
+	//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+			ent->client->Ammo_rds--;
+		}
 
 	fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
 
@@ -1052,6 +1305,22 @@ void Machinegun_Fire (edict_t *ent)
 	VectorSet(offset, 0, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+
+	//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
+			ent->client->Ammo_rds--;
+		}
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1243,6 +1512,22 @@ void weapon_shotgun_fire (edict_t *ent)
 	VectorSet(offset, 0, 8,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
+	//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
+			ent->client->Ammo_rds--;
+		}
+
 	if (is_quad)
 	{
 		damage *= 4;
@@ -1371,6 +1656,23 @@ void weapon_railgun_fire (edict_t *ent)
 
 	VectorSet(offset, 0, 7,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
+		{
+			//Hard coded for reload only.
+			ent->client->ps.gunframe=64;
+			ent->client->weaponstate = WEAPON_END_MAG;
+			fire_rail (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
+			ent->client->Ammo_rds--;
+		}
+		else
+		{
+			//If no reload, fire normally.
+			fire_rail (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
+			ent->client->Ammo_rds--;
+		}
+
 	fire_rail (ent, start, forward, damage, kick);
 
 	// send muzzle flash
@@ -1524,22 +1826,22 @@ void Weapon_BFG (edict_t *ent)
 		P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 		
 	
-		//BD 3/4 - Added to animate last round firing...
-		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Mk23_rds == 1))
+		//Added to animate last round firing...
+		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
 			ent->client->ps.gunframe=64;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
-			ent->client->Mk23_rds--;
+			ent->client->Ammo_rds--;
 		}
 		else
 		{
 			//If no reload, fire normally.
 			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
-			ent->client->Mk23_rds--;
+			ent->client->Ammo_rds--;
 		}
-		//BD - Use our firing sound
+		//Use our firing sound
 		gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23fire.wav"), 1, ATTN_NORM, 0);
 	
 
@@ -1564,5 +1866,59 @@ void Weapon_BFG (edict_t *ent)
 
 			//The call is made...
 		Weapon_Generic (ent, 9, 14, 39, 42, 63, 68, pause_frames, fire_frames, Pistol_Fire);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void fire_sword ( edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
+	{    
+		trace_t tr; //detect whats in front of you up to range "vec3_t end"
+ 
+		vec3_t end;
+ 
+		// Figure out what we hit, if anything:
+ 
+		VectorMA (start, 3.0, aimdir, end);  //calculates the range vector                      
+ 
+		tr = gi.trace (self->s.origin, NULL, NULL, end, self, MASK_SHOT);
+                        // figuers out what in front of the player up till "end"
+    
+		// Figure out what to do about what we hit, if anything
+ 
+		if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))    
+		{
+			if (tr.fraction < 1.0)        
+			{            
+				if (tr.ent->takedamage)            
+				{
+					//This tells us to damage the thing that in our path...hehe
+					T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, 0, 35);
+					gi.sound (self, CHAN_AUTO, gi.soundindex("misc/fhit3.wav") , 1, ATTN_NORM, 0); 
+ 
+				}        
+				else        
+				{                
+					gi.WriteByte (svc_temp_entity);    
+					gi.WriteByte (TE_SPARKS);
+					gi.WritePosition (tr.endpos);    
+					gi.WriteDir (tr.plane.normal);
+					gi.multicast (tr.endpos, MULTICAST_PVS);
+ 
+					gi.sound (self, CHAN_AUTO, gi.soundindex("weapons/grenlb1b.wav") , 1, ATTN_NORM, 0);
+ 
+				}    
+			}
+		}
+		return;
+	}
+	void Weapon_Sword(edict_t *ent)
+	{
+		//Idle animation entry points - These make the fidgeting look more random
+		static int	pause_frames[]	= {13, 32, 42};
+		//The frames at which the weapon will fire
+		static int	fire_frames[]	= {10, 0};
+
+			//The call is made...
+		Weapon_Generic (ent, 9, 14, 39, 42, 0, 0, pause_frames, fire_frames, Pistol_Fire);
 	}
 //======================================================================

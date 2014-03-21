@@ -296,12 +296,16 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		{
 			switch (mod)
 			{
-			//+BD Add our client obit messages
+			// Add our client obit messages
 			case MOD_Mk23:		
 				message = "was ventilated by";
 				message2= "'s Mark 23 Pistol";
 				break;
-			//+BD end of add
+			case MOD_MELEE:		
+				message = "was beat to death by";
+				message2= "'s BaseBall Bat";
+				break;
+			// end of add
 			case MOD_BLASTER:
 				message = "was blasted by";
 				break;
@@ -1252,8 +1256,8 @@ void PutClientInServer (edict_t *ent)
 	Add_Ammo(ent,item,48);
 
 	//makeing clip size
-	client->Mk23_max = 12;
-    client->Mk23_rds = client->Mk23_max;
+	client->Ammo_max = 12;
+	client->Ammo_rds = client->Ammo_max;
 
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;

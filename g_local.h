@@ -486,6 +486,7 @@ extern	int	body_armor_index;
 #define MOD_TARGET_BLASTER	33
 //+BD - Added for firing. Tells server how you died?
 #define MOD_Mk23			34
+#define MOD_MELEE			35
 #define MOD_FRIENDLY_FIRE	0x8000000
 
 extern	int	meansOfDeath;
@@ -947,8 +948,8 @@ struct gclient_s
 
 	float		respawn_time;		// can respawn when time > this
 
-	int			Mk23_max;			//max ammo
-	int			Mk23_rds;			//rounds left
+	int			Ammo_max;			//max ammo
+	int			Ammo_rds;			//rounds left
 
 
 	edict_t		*chase_target;		// player we are chasing

@@ -997,7 +997,7 @@ void ClientCommand (edict_t *ent)
 
    		//First, grab the current magazine max count...
   		if(stricmp(ent->client->pers.weapon->pickup_name, "Mk23") == 0)
-      			rds_left = ent->client->Mk23_max;
+      			rds_left = ent->client->Ammo_max;
 		else    //We should never get here, but...
   			 //BD 5/26 - Actually we get here quite often right now. Just exit for weaps that we
    			//          don't want reloaded or that never reload (grenades)
