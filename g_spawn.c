@@ -1,4 +1,3 @@
-
 #include "g_local.h"
 
 typedef struct
@@ -269,7 +268,7 @@ void ED_CallSpawn (edict_t *ent)
 	}
 
 	// check item spawn functions
-	for (i=0,item=itemlist ; i<game.num_items ; i++,item++)
+	/*for (i=0,item=itemlist ; i<game.num_items ; i++,item++)
 	{
 		if (!item->classname)
 			continue;
@@ -278,7 +277,7 @@ void ED_CallSpawn (edict_t *ent)
 			SpawnItem (ent, item);
 			return;
 		}
-	}
+	}*/
 
 	// check normal spawn functions
 	for (s=spawns ; s->name ; s++)
