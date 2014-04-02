@@ -107,7 +107,6 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 
 	targ->die (targ, inflictor, attacker, damage, point);
 
-	GunGame(attacker);// call method here
 
 }
 
@@ -484,6 +483,10 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))
 				targ->flags |= FL_NO_KNOCKBACK;
+			if (attacker->client)
+			{
+				GunGame(attacker); // call method
+			}
 			Killed (targ, inflictor, attacker, take, point);
 			return;
 		}
@@ -521,6 +524,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		client->damage_blood += take;
 		client->damage_knockback += knockback;
 		VectorCopy (point, client->damage_from);
+
 	}
 }
 

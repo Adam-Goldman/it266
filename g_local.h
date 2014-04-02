@@ -216,6 +216,8 @@ typedef struct
 #define WEAP_HYPERBLASTER		9 
 #define WEAP_RAILGUN			10
 #define WEAP_BFG				11
+#define WEAP_MK23				12
+#define WEAP_SWORD				13
 
 typedef struct gitem_s
 {

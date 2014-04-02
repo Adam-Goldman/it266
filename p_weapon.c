@@ -332,9 +332,7 @@ Drop_Weapon
 void Drop_Weapon (edict_t *ent, gitem_t *item)
 {
 	int		index;
-
-	if ((int)(dmflags->value) & DF_WEAPONS_STAY)
-		return;
+gi.cprintf (ent, PRINT_HIGH, "Can I drop it like its hard?\n");
 
 	index = ITEM_INDEX(item);
 	// see if we're already using it
@@ -353,59 +351,81 @@ void GunGame(edict_t *ent)
 {
 	gitem_t		*pickup_item;
 	gitem_t		*drop_item;
-	int i;
+	gitem_t		*ammo;
+	int			i,index,index2;
 
-	if(ent->client->resp.score++)
-	{	
-		i = 1;
-		i++;
-		
-		
-		switch(i)
-		{
-			case 2:
-				pickup_item = FindItem("Blaster");
-				drop_item = FindItem("Mk23");
-				break;
-			case 3:
-				pickup_item = FindItem("Blaster");
-				drop_item = FindItem("Shotgun");
-				break;
-			case 4:
-				pickup_item = FindItem("Super Shotgun");
-				drop_item = FindItem("Shotgun");
-				break;
-			case 5:
-				pickup_item = FindItem("Chaingun");
-				drop_item = FindItem("Super Shotgun");
-				break;
-			case 6:
-				pickup_item = FindItem("HyperBlaster");
-				drop_item = FindItem("Chaingun");
-				break;
-			case 7:
-				pickup_item = FindItem("Grenade Launcher");
-				drop_item = FindItem("HyperBlaster");
-				break;
-			case 8:
-				pickup_item = FindItem("Rocket Launcher");
-				drop_item = FindItem("Grenade Launcher");
-				break;
-			case 9:
-				pickup_item = FindItem("Railgun");
-				drop_item = FindItem("Rocket Launcher");
-				break;
-			case 10:
-				pickup_item = FindItem("Sword");
-				drop_item = FindItem("Railgun");
-				break;
-		}
-		Pickup_Weapon(ent->client, pickup_item);
-		Drop_Weapon(ent->client,drop_item);
-		ent->client->pers.selected_item = ITEM_INDEX(pickup_item);
-		ent->client->pers.inventory[ent->client->pers.selected_item] = 1;
-		ent->client->newweapon = ent->client->pers.weapon;
+	if (!ent)
+	{
+		return;
 	}
+	if (!ent->client)
+	{
+		return;
+	}
+	ent->client->resp.score++;
+		
+	i = ent->client->resp.score;
+
+
+	switch(i)
+	{
+		case 2:
+			pickup_item = FindItem("Blaster");
+			drop_item = FindItem("Mk23");
+			break;
+		case 3:
+			pickup_item = FindItem("Shotgun");
+			drop_item = FindItem("Blaster");
+			ammo = FindItem ("Shells");
+			break;
+		case 4:
+			pickup_item = FindItem("Super Shotgun");
+			drop_item = FindItem("Shotgun");
+			ammo = FindItem ("Shells");
+			break;
+		case 5:
+			pickup_item = FindItem("Chaingun");
+			drop_item = FindItem("Super Shotgun");
+			ammo = FindItem ("Bullets");
+			break;
+		case 6:
+			pickup_item = FindItem("HyperBlaster");
+			drop_item = FindItem("Chaingun");
+			ammo = FindItem ("Cells");
+			break;
+		case 7:
+			pickup_item = FindItem("Grenade Launcher");
+			drop_item = FindItem("HyperBlaster");
+			ammo = FindItem ("Grenades");
+			break;
+		case 8:
+			pickup_item = FindItem("Rocket Launcher");
+			drop_item = FindItem("Grenade Launcher");
+			ammo = FindItem ("Rockets");
+			break; 
+		case 9:
+			pickup_item = FindItem("Railgun");
+			drop_item = FindItem("Rocket Launcher");
+			ammo = FindItem ("Slugs");
+			break;
+		case 10:
+			pickup_item = FindItem("Sword");
+			drop_item = FindItem("Railgun");
+			break;
+	}
+
+	index = ITEM_INDEX(pickup_item);
+	index2 = ITEM_INDEX(drop_item);
+	gi.cprintf(ent->client,PRINT_HIGH,(char*)index);
+	gi.cprintf(ent->client,PRINT_HIGH,(char*)index2);
+	return;
+	ent->client->pers.inventory[index]++;
+	Add_Ammo (ent, ammo, 1000);
+	Drop_Item (ent->client, drop_item);
+	ent->client->pers.inventory[index2]--;
+	ent->client->pers.selected_item = ITEM_INDEX(pickup_item);
+	ent->client->pers.inventory[ent->client->pers.selected_item] = 1;
+	ent->client->newweapon = ent->client->pers.weapon;
 }
 
 
@@ -811,8 +831,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
 
 	ent->client->grenade_time = level.time + 1.0;
 
@@ -975,7 +995,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=0;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
 			ent->client->Ammo_rds--;
@@ -998,8 +1018,9 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
+
 }
 
 void Weapon_GrenadeLauncher (edict_t *ent)
@@ -1007,7 +1028,7 @@ void Weapon_GrenadeLauncher (edict_t *ent)
 	static int	pause_frames[]	= {34, 51, 59, 0};
 	static int	fire_frames[]	= {6, 0};
 
-	Weapon_Generic (ent, 5, 16, 59, 64, 0,0, pause_frames, fire_frames, weapon_grenadelauncher_fire);
+	Weapon_Generic (ent, 5, 16, 59, 64, 0,5, pause_frames, fire_frames, weapon_grenadelauncher_fire);
 }
 
 /*
@@ -1044,10 +1065,11 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
 
+	//Added to animate last round firing...
 	if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=0;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
 			ent->client->Ammo_rds--;
@@ -1069,8 +1091,8 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
 void Weapon_RocketLauncher (edict_t *ent)
@@ -1078,7 +1100,7 @@ void Weapon_RocketLauncher (edict_t *ent)
 	static int	pause_frames[]	= {25, 33, 42, 50, 0};
 	static int	fire_frames[]	= {5, 0};
 
-	Weapon_Generic (ent, 4, 12, 50, 54, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
+	Weapon_Generic (ent, 4, 12, 50, 53, 4, 12, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
 }
 
 
@@ -1110,7 +1132,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=12;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
 			ent->client->Ammo_rds--;
@@ -1154,7 +1176,7 @@ void Weapon_Blaster (edict_t *ent)
 	static int	pause_frames[]	= {19, 32, 0};
 	static int	fire_frames[]	= {5, 0};
 
-	Weapon_Generic (ent, 4, 8, 52, 55, 0,0, pause_frames, fire_frames, Weapon_Blaster_Fire);
+	Weapon_Generic (ent, 4, 8, 52, 54, 4,8, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
 
@@ -1198,8 +1220,8 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 			else
 				damage = 20;
 			Blaster_Fire (ent, offset, damage, true, effect);
-			if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-				ent->client->pers.inventory[ent->client->ammo_index]--;
+			//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+				//ent->client->pers.inventory[ent->client->ammo_index]--;
 
 			ent->client->anim_priority = ANIM_ATTACK;
 			if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -1232,7 +1254,7 @@ void Weapon_HyperBlaster (edict_t *ent)
 	static int	pause_frames[]	= {0};
 	static int	fire_frames[]	= {6, 7, 8, 9, 10, 11, 0};
 
-	Weapon_Generic (ent, 5, 20, 49, 53, 0,0, pause_frames, fire_frames, Weapon_HyperBlaster_Fire);
+	Weapon_Generic (ent, 5, 20, 49, 52, 5,20, pause_frames, fire_frames, Weapon_HyperBlaster_Fire);
 }
 
 /*
@@ -1310,7 +1332,7 @@ void Machinegun_Fire (edict_t *ent)
 		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=0;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
 			ent->client->Ammo_rds--;
@@ -1329,8 +1351,8 @@ void Machinegun_Fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
 
 	ent->client->anim_priority = ANIM_ATTACK;
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -1468,8 +1490,8 @@ void Chaingun_Fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= shots;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index] -= shots;
 }
 
 
@@ -1478,7 +1500,7 @@ void Weapon_Chaingun (edict_t *ent)
 	static int	pause_frames[]	= {38, 43, 51, 61, 0};
 	static int	fire_frames[]	= {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 0};
 
-	Weapon_Generic (ent, 4, 31, 61, 64, 0,0, pause_frames, fire_frames, Chaingun_Fire);
+	Weapon_Generic (ent, 4, 31, 61, 63, 4,31, pause_frames, fire_frames, Chaingun_Fire);
 }
 
 
@@ -1516,7 +1538,7 @@ void weapon_shotgun_fire (edict_t *ent)
 		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=0;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
 			ent->client->Ammo_rds--;
@@ -1548,8 +1570,8 @@ void weapon_shotgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
 void Weapon_Shotgun (edict_t *ent)
@@ -1557,7 +1579,7 @@ void Weapon_Shotgun (edict_t *ent)
 	static int	pause_frames[]	= {22, 28, 34, 0};
 	static int	fire_frames[]	= {8, 9, 0};
 
-	Weapon_Generic (ent, 7, 18, 36, 39, 0,0, pause_frames, fire_frames, weapon_shotgun_fire);
+	Weapon_Generic (ent, 7, 18, 36, 38, 7,18, pause_frames, fire_frames, weapon_shotgun_fire);
 }
 
 
@@ -1602,8 +1624,8 @@ void weapon_supershotgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index] -= 2;
 }
 
 void Weapon_SuperShotgun (edict_t *ent)
@@ -1611,7 +1633,7 @@ void Weapon_SuperShotgun (edict_t *ent)
 	static int	pause_frames[]	= {29, 42, 57, 0};
 	static int	fire_frames[]	= {7, 0};
 
-	Weapon_Generic (ent, 6, 17, 57, 61, 0,0, pause_frames, fire_frames, weapon_supershotgun_fire);
+	Weapon_Generic (ent, 6, 17, 57, 60, 6,17, pause_frames, fire_frames, weapon_supershotgun_fire);
 }
 
 
@@ -1631,6 +1653,7 @@ void weapon_railgun_fire (edict_t *ent)
 	vec3_t		offset;
 	int			damage;
 	int			kick;
+	int			i = 0;
 
 	if (deathmatch->value)
 	{	// normal damage is too extreme in dm
@@ -1661,10 +1684,12 @@ void weapon_railgun_fire (edict_t *ent)
 		if (ent->client->pers.inventory[ent->client->ammo_index] == 1 || (ent->client->Ammo_rds == 1))
 		{
 			//Hard coded for reload only.
-			ent->client->ps.gunframe=64;
+			ent->client->ps.gunframe=0;
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_rail (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
 			ent->client->Ammo_rds--;
+			
+
 		}
 		else
 		{
@@ -1684,8 +1709,8 @@ void weapon_railgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index]--;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index]--;
 }
 
 
@@ -1694,7 +1719,7 @@ void Weapon_Railgun (edict_t *ent)
 	static int	pause_frames[]	= {56, 0};
 	static int	fire_frames[]	= {4, 0};
 
-	Weapon_Generic (ent, 3, 18, 56, 61, 0,0, pause_frames, fire_frames, weapon_railgun_fire);
+	Weapon_Generic (ent, 3, 18, 56, 60, 3,18, pause_frames, fire_frames, weapon_railgun_fire);
 }
 
 
@@ -1760,8 +1785,8 @@ void weapon_bfg_fire (edict_t *ent)
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
+	//if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		//ent->client->pers.inventory[ent->client->ammo_index] -= 50;
 }
 
 void Weapon_BFG (edict_t *ent)
@@ -1778,7 +1803,7 @@ void Weapon_BFG (edict_t *ent)
 	//the correct animation for the Mk23.
 	void Pistol_Fire(edict_t *ent)
 	{
-		int	i;
+		int			i;
 		vec3_t		start;
 		vec3_t		forward, right;
 		vec3_t		angles;
@@ -1834,6 +1859,8 @@ void Weapon_BFG (edict_t *ent)
 			ent->client->weaponstate = WEAPON_END_MAG;
 			fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD,MOD_Mk23);
 			ent->client->Ammo_rds--;
+			
+			
 		}
 		else
 		{
@@ -1854,7 +1881,7 @@ void Weapon_BFG (edict_t *ent)
 		PlayerNoise(ent, start, PNOISE_WEAPON);
 
 		//Ammo depletion here. 
-		ent->client->pers.inventory[ent->client->ammo_index] -= ent->client->pers.weapon->quantity;	
+		//ent->client->pers.inventory[ent->client->ammo_index] -= ent->client->pers.weapon->quantity;	
 	}
 
 	void Weapon_Pistol (edict_t *ent)
@@ -1870,55 +1897,52 @@ void Weapon_BFG (edict_t *ent)
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void fire_sword ( edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick)
-	{    
-		trace_t tr; //detect whats in front of you up to range "vec3_t end"
- 
-		vec3_t end;
- 
-		// Figure out what we hit, if anything:
- 
-		VectorMA (start, 3.0, aimdir, end);  //calculates the range vector                      
- 
-		tr = gi.trace (self->s.origin, NULL, NULL, end, self, MASK_SHOT);
-                        // figuers out what in front of the player up till "end"
-    
-		// Figure out what to do about what we hit, if anything
- 
-		if (!((tr.surface) && (tr.surface->flags & SURF_SKY)))    
-		{
-			if (tr.fraction < 1.0)        
-			{            
-				if (tr.ent->takedamage)            
-				{
-					//This tells us to damage the thing that in our path...hehe
-					T_Damage (tr.ent, self, self, aimdir, tr.endpos, tr.plane.normal, damage, kick, 0, 35);
-					gi.sound (self, CHAN_AUTO, gi.soundindex("misc/fhit3.wav") , 1, ATTN_NORM, 0); 
- 
-				}        
-				else        
-				{                
-					gi.WriteByte (svc_temp_entity);    
-					gi.WriteByte (TE_SPARKS);
-					gi.WritePosition (tr.endpos);    
-					gi.WriteDir (tr.plane.normal);
-					gi.multicast (tr.endpos, MULTICAST_PVS);
- 
-					gi.sound (self, CHAN_AUTO, gi.soundindex("weapons/grenlb1b.wav") , 1, ATTN_NORM, 0);
- 
-				}    
-			}
-		}
-		return;
+	void Melee_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, int effect)
+	{
+	
+		int	i;
+		vec3_t		start;
+		vec3_t		forward, right;
+		vec3_t		angles;
+		int			kick = 2;
+		vec3_t		offset;
+
+		if (is_quad)
+			damage *= 4;
+
+		VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
+		AngleVectors (angles, forward, right, NULL);
+		VectorSet(offset, 0, 8, ent->viewheight-8);
+		P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+		fire_bullet (ent, start, forward, 2000, kick, 1, 1, MOD_MELEE);
+		gi.sound(ent, CHAN_WEAPON, gi.soundindex("weapons/mk23fire.wav"), 1, ATTN_NORM, 0);
+
+		gi.WriteByte (svc_muzzleflash);
+		gi.WriteShort (ent-g_edicts);
+		if (hyper)
+			gi.WriteByte (MZ_HYPERBLASTER | is_silenced);
+		else
+			gi.WriteByte (MZ_BLASTER | is_silenced);
+		gi.multicast (ent->s.origin, MULTICAST_PVS);
+
+		PlayerNoise(ent, start, PNOISE_WEAPON);
 	}
-	void Weapon_Sword(edict_t *ent)
+	void Weapon_Melee_Fire (edict_t *ent)
+	{
+		int		damage = 5000;
+
+
+		Melee_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
+		ent->client->ps.gunframe++;
+	}
+	void Weapon_Melee(edict_t *ent)
 	{
 		//Idle animation entry points - These make the fidgeting look more random
 		static int	pause_frames[]	= {13, 32, 42};
 		//The frames at which the weapon will fire
-		static int	fire_frames[]	= {10, 0};
+		static int	fire_frames[]	= {6,0};
 
 			//The call is made...
-		Weapon_Generic (ent, 9, 14, 39, 42, 0, 0, pause_frames, fire_frames, Pistol_Fire);
+		Weapon_Generic (ent, 7, 18, 36, 39,0,0, pause_frames, fire_frames, Weapon_Melee_Fire);
 	}
 //======================================================================

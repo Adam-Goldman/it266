@@ -17,7 +17,7 @@ void Weapon_GrenadeLauncher (edict_t *ent);
 void Weapon_Railgun (edict_t *ent);
 void Weapon_BFG (edict_t *ent);
 void Weapon_Pistol(edict_t *ent);
-void Weapon_Sword(edict_t *ent);
+void Weapon_Melee(edict_t *ent);
 
 gitem_armor_t jacketarmor_info	= { 25,  50, .30, .00, ARMOR_JACKET};
 gitem_armor_t combatarmor_info	= { 50, 100, .60, .30, ARMOR_COMBAT};
@@ -1522,54 +1522,55 @@ always owned, never in the world
 /* precache */ "sprites/s_bfg1.sp2 sprites/s_bfg2.sp2 sprites/s_bfg3.sp2 weapons/bfg__f1y.wav weapons/bfg__l1a.wav weapons/bfg__x1b.wav weapons/bfg_hum.wav"
 	},
 
-	/* weapon_sword
-	always owned, never in the world
-	*/
-	{
-			"weapon_sword", 
-			Pickup_Weapon,
-			Use_Weapon,                              //How to use
-			Drop_Weapon,
-			Weapon_Sword,                            //What the function is
-			"misc/w_pkup.wav",
-			"models/weapons/v_buckshot/tris.md2",      //The models stuff
-			"w_blaster",                                     //Icon to be used
-			"Sword",                                         //Pickup name
-			0,
-			0,
-			NULL,
-			IT_WEAPON,
-			NULL,
-			0,
-			"weapons/hgrenlb1b.wav misc/fhit3.wav"
-			// The sound of the grenade bouncing. This is precached 
-			// New Sword impact sounds -- DanE
-		},
-
 	/* +BD 2/7 - Our SOCOM Mk23 Pistol. This will replace the blaster as the standard sidearm
 	*   itemlist[6]
 	*/
 
 		{
 			"weapon_Mk23",
-			NULL,
+			Pickup_Weapon,
 			Use_Weapon,
 			Drop_Weapon,
 			Weapon_Pistol,
 			"misc/w_pkup.wav",
-			/*NULL,
-			0,*/
-			"models/weapons/v_machn/tris.md2", EF_ROTATE,
+			"models/weapons/g_machn/tris.md2", EF_ROTATE,
 			"models/weapons/v_mk23/tris.md2",//"models/weapons/v_machn/tris.md2",
 			"w_blaster",//"w_mk23", //we need an icon for the Mk23
 			"Mk23",
 			0,
 			1,
 			"Bullets",
-			IT_WEAPON,
+			IT_WEAPON|IT_STAY_COOP,
+			WEAP_MK23,
 			NULL,
 			0,
 			""
+		},
+
+		/* weapon_sword
+	always owned, never in the world
+	*/
+	{
+			"weapon_sword", 
+			Pickup_Weapon,
+			Use_Weapon,
+			Drop_Weapon,
+			Weapon_Melee,
+			"misc/w_pkup.wav",
+			"models/weapons/v_buckshot/tris.md2", EF_ROTATE,
+			"models/weapons/v_buckshot/tris.md2",
+/* icon */		"w_blaster",
+/* pickup */	"Sword",
+			0,
+			0,
+			NULL,
+			IT_WEAPON|IT_STAY_COOP,
+			WEAP_SWORD,
+			NULL,
+			0,
+/* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
+			// The sound of the grenade bouncing. This is precached 
+			// New Sword impact sounds -- DanE
 		},
 
 	//

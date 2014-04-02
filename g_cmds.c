@@ -998,13 +998,36 @@ void ClientCommand (edict_t *ent)
    		//First, grab the current magazine max count...
   		if(stricmp(ent->client->pers.weapon->pickup_name, "Mk23") == 0)
       			rds_left = ent->client->Ammo_max;
-		else    //We should never get here, but...
-  			 //BD 5/26 - Actually we get here quite often right now. Just exit for weaps that we
-   			//          don't want reloaded or that never reload (grenades)
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Blaster") == 0)
+      			ent->client->newweapon = FindItem ("blaster");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Rocket Launcher") == 0)
+      			ent->client->newweapon = FindItem ("rocket launcher");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Grenade Launcher") == 0)
+      			ent->client->newweapon = FindItem ("grenade launcher");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Chaingun") == 0)
+      			ent->client->newweapon = FindItem ("chaingun");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Shotgun") == 0)
+      			ent->client->newweapon = FindItem ("shotgun");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Super Shotgun") == 0)
+      			ent->client->newweapon = FindItem ("super shotgun");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "HyperBlaster") == 0)
+      			ent->client->newweapon = FindItem ("hyperblaster");
+		
+		else if(stricmp(ent->client->pers.weapon->pickup_name, "Railgun") == 0)
+      			ent->client->newweapon = FindItem ("railgun");
+		else
   	 	{
       			gi.centerprintf(ent,"Where'd you train?\nYou can't reload that!\n");
       			return;
    		}
+
 
    		if(ent->client->pers.inventory[ent->client->ammo_index])
    		{       
